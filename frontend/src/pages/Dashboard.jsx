@@ -37,50 +37,47 @@ export default function Dashboard() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f5f5f5' }}>
+    <div className="page">
       <Navbar />
-      <div style={{ maxWidth: '800px', margin: '0 auto', padding: '2rem' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+      <div className="container">
+        <div className="page-header">
           <div>
-            <h1 style={{ fontSize: '1.5rem', fontWeight: 700 }}>Welcome back, {user?.display_name}!</h1>
-            <p style={{ color: '#666', marginTop: '0.25rem' }}>Your language decks</p>
+            <h1 className="page-title">Welcome back, {user?.display_name}</h1>
+            <p className="page-subtitle">Your language decks</p>
           </div>
-          <button
-            onClick={() => setShowAdd(!showAdd)}
-            style={{ padding: '0.6rem 1.25rem', background: '#2563eb', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}
-          >
-            + Add Language
+          <button className="btn btn-primary" onClick={() => setShowAdd(!showAdd)}>
+            + Add deck
           </button>
         </div>
 
         {showAdd && (
-          <form onSubmit={handleAdd} style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', marginBottom: '1.5rem', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
-            <h3 style={{ marginBottom: '1rem' }}>New Language</h3>
-            {error && <p style={{ color: 'red', marginBottom: '0.75rem' }}>{error}</p>}
-            <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end' }}>
-              <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 500 }}>Language name</label>
+          <form onSubmit={handleAdd} className="card card-padded" style={{ marginBottom: '1.25rem' }}>
+            <h3 style={{ marginBottom: '1rem' }}>New deck</h3>
+            {error && <div className="error-msg" style={{ marginBottom: '0.875rem' }}>{error}</div>}
+            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-end' }}>
+              <div className="form-group" style={{ flex: 1 }}>
+                <label className="form-label">Language</label>
                 <input
+                  className="input"
                   value={newLang.name}
                   onChange={e => setNewLang({ ...newLang, name: e.target.value })}
                   placeholder="e.g. Arabic"
-                  style={{ width: '100%', padding: '0.6rem', border: '1px solid #ddd', borderRadius: '8px' }}
                   required
+                  autoFocus
                 />
               </div>
-              <div style={{ width: '100px' }}>
-                <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 500 }}>Flag emoji</label>
+              <div className="form-group" style={{ width: '90px' }}>
+                <label className="form-label">Flag</label>
                 <input
+                  className="input"
                   value={newLang.flag_emoji}
                   onChange={e => setNewLang({ ...newLang, flag_emoji: e.target.value })}
                   placeholder="🇸🇦"
-                  style={{ width: '100%', padding: '0.6rem', border: '1px solid #ddd', borderRadius: '8px', fontSize: '1.25rem' }}
+                  style={{ fontSize: '1.2rem', textAlign: 'center' }}
                 />
               </div>
-              <button type="submit" style={{ padding: '0.6rem 1.25rem', background: '#2563eb', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}>
-                Add
-              </button>
-              <button type="button" onClick={() => setShowAdd(false)} style={{ padding: '0.6rem 1.25rem', border: '1px solid #ddd', borderRadius: '8px', cursor: 'pointer', background: 'white' }}>
+              <button className="btn btn-primary" type="submit">Add</button>
+              <button className="btn btn-outline" type="button" onClick={() => { setShowAdd(false); setError('') }}>
                 Cancel
               </button>
             </div>
@@ -88,34 +85,28 @@ export default function Dashboard() {
         )}
 
         {loading ? (
-          <p style={{ color: '#666' }}>Loading...</p>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Loading…</p>
         ) : languages.length === 0 ? (
-          <div style={{ background: 'white', padding: '3rem', borderRadius: '12px', textAlign: 'center', color: '#666' }}>
-            <p style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📚</p>
-            <p style={{ fontWeight: 500 }}>No language decks yet</p>
-            <p style={{ fontSize: '0.9rem', marginTop: '0.25rem' }}>Add your first language to get started</p>
+          <div className="empty-state">
+            <div className="empty-icon">📚</div>
+            <p className="empty-title">No decks yet</p>
+            <p className="empty-text">Add your first language deck to get started</p>
           </div>
         ) : (
-          <div style={{ display: 'grid', gap: '1rem' }}>
+          <div className="card-list">
             {languages.map(lang => (
-              <div key={lang.id} style={{ background: 'white', padding: '1.25rem 1.5rem', borderRadius: '12px', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', cursor: 'pointer' }} onClick={() => navigate(`/languages/${lang.id}`)}>
-                  <span style={{ fontSize: '2rem' }}>{lang.flag_emoji || '🌐'}</span>
+              <div key={lang.id} className="deck-card">
+                <div className="deck-info" onClick={() => navigate(`/languages/${lang.id}`)}>
+                  <span className="deck-flag">{lang.flag_emoji || '🌐'}</span>
                   <div>
-                    <p style={{ fontWeight: 600, fontSize: '1.1rem' }}>{lang.name}</p>
-                    <p style={{ color: '#666', fontSize: '0.9rem' }}>{lang.card_count} {lang.card_count === 1 ? 'card' : 'cards'}</p>
+                    <p className="deck-name">{lang.name}</p>
+                    <p className="deck-count">{lang.card_count} {lang.card_count === 1 ? 'card' : 'cards'}</p>
                   </div>
                 </div>
-                <div style={{ display: 'flex', gap: '0.75rem' }}>
-                  <button onClick={() => navigate(`/review/${lang.id}`)} style={{ padding: '0.5rem 1rem', background: '#f0fdf4', color: '#16a34a', border: '1px solid #bbf7d0', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}>
-                    Review
-                  </button>
-                  <button onClick={() => navigate(`/languages/${lang.id}`)} style={{ padding: '0.5rem 1rem', background: '#eff6ff', color: '#2563eb', border: '1px solid #bfdbfe', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}>
-                    Cards
-                  </button>
-                  <button onClick={() => handleDelete(lang.id, lang.name)} style={{ padding: '0.5rem 1rem', background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca', borderRadius: '8px', cursor: 'pointer' }}>
-                    Delete
-                  </button>
+                <div className="deck-actions">
+                  <button className="btn btn-sm btn-review" onClick={() => navigate(`/review/${lang.id}`)}>Review</button>
+                  <button className="btn btn-sm btn-cards" onClick={() => navigate(`/languages/${lang.id}`)}>Cards</button>
+                  <button className="btn btn-sm btn-danger-soft" onClick={() => handleDelete(lang.id, lang.name)}>Delete</button>
                 </div>
               </div>
             ))}

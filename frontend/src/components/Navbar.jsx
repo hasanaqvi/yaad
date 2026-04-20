@@ -1,25 +1,25 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { useTheme } from '../context/ThemeContext'
 
 export default function Navbar() {
   const { user, logout } = useAuth()
+  const { theme, toggle } = useTheme()
   const navigate = useNavigate()
 
-  const handleLogout = () => {
-    logout()
-    navigate('/login')
-  }
-
   return (
-    <nav style={{ background: 'white', borderBottom: '1px solid #e5e7eb', padding: '0 2rem', height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-      <Link to="/" style={{ textDecoration: 'none', color: '#1a1a1a' }}>
-        <span style={{ fontSize: '1.5rem', fontWeight: 700 }}>یاد</span>
+    <nav className="navbar">
+      <Link to="/" className="navbar-left">
+        <span className="logo-text">يَاد</span>
       </Link>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-        <Link to="/" style={{ textDecoration: 'none', color: '#555', fontWeight: 500 }}>Languages</Link>
-        <span style={{ color: '#555' }}>{user?.display_name}</span>
-        <button onClick={handleLogout} style={{ padding: '0.4rem 1rem', border: '1px solid #ddd', borderRadius: '8px', background: 'white', cursor: 'pointer', color: '#555' }}>
-          Logout
+      <div className="navbar-right">
+        <Link to="/" className="navbar-link">Decks</Link>
+        <span className="navbar-user">{user?.display_name}</span>
+        <button className="theme-toggle" onClick={toggle} title={theme === 'dark' ? 'Switch to light' : 'Switch to dark'}>
+          {theme === 'dark' ? '☀️' : '🌙'}
+        </button>
+        <button className="btn btn-outline btn-sm" onClick={() => { logout(); navigate('/login') }}>
+          Sign out
         </button>
       </div>
     </nav>

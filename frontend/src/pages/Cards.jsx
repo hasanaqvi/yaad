@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import api from '../api/client'
 import Navbar from '../components/Navbar'
@@ -11,8 +11,14 @@ export default function Cards() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [showAdd, setShowAdd] = useState(false)
-  const [newCard, setNewCard] = useState({ english: '', translation: '', notes: '', pronunciation: '' })
+  const [newCard, setNewCard] = useState({ english: '', translation: '', notes: '' })
   const [error, setError] = useState('')
+  const [flash, setFlash] = useState(false)
+  const [addedCount, setAddedCount] = useState(0)
+
+  const englishRef = useRef(null)
+  const translationRef = useRef(null)
+  const notesRef = useRef(null)
 
   useEffect(() => {
     api.get('/languages/').then(res => {
@@ -21,6 +27,15 @@ export default function Cards() {
     })
     fetchCards()
   }, [languageId])
+
+  useEffect(() => {
+    if (showAdd) {
+      setTimeout(() => englishRef.current?.focus(), 50)
+    } else {
+      setAddedCount(0)
+      setError('')
+    }
+  }, [showAdd])
 
   const fetchCards = async (q = '') => {
     const params = q ? `?search=${q}` : ''
@@ -35,16 +50,34 @@ export default function Cards() {
     fetchCards(q)
   }
 
-  const handleAdd = async (e) => {
-    e.preventDefault()
+  const submitCard = async () => {
+    if (!newCard.english.trim() || !newCard.translation.trim()) return
     setError('')
     try {
       const res = await api.post(`/cards/${languageId}`, newCard)
-      setCards([res.data, ...cards])
-      setNewCard({ english: '', translation: '', notes: '', pronunciation: '' })
-      setShowAdd(false)
+      setCards(prev => [res.data, ...prev])
+      setNewCard({ english: '', translation: '', notes: '' })
+      setAddedCount(c => c + 1)
+      setFlash(true)
+      setTimeout(() => setFlash(false), 1800)
+      englishRef.current?.focus()
     } catch (err) {
       setError(err.response?.data?.detail || 'Failed to add card')
+    }
+  }
+
+  const handleKeyDown = (e, field) => {
+    if (e.key === 'Escape') {
+      setShowAdd(false)
+      return
+    }
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      if (field === 'english') {
+        translationRef.current?.focus()
+      } else {
+        submitCard()
+      }
     }
   }
 
@@ -55,79 +88,110 @@ export default function Cards() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f5f5f5' }}>
+    <div className="page">
       <Navbar />
-      <div style={{ maxWidth: '800px', margin: '0 auto', padding: '2rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-          <button onClick={() => navigate('/')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#666', fontSize: '1rem' }}>← Back</button>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 700 }}>
-            {language?.flag_emoji} {language?.name}
-          </h1>
-          <span style={{ color: '#666', fontSize: '0.9rem' }}>{cards.length} cards</span>
-        </div>
-
-        <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
-          <input
-            value={search}
-            onChange={handleSearch}
-            placeholder="Search cards..."
-            style={{ flex: 1, padding: '0.6rem 1rem', border: '1px solid #ddd', borderRadius: '8px', background: 'white' }}
-          />
-          <button
-            onClick={() => setShowAdd(!showAdd)}
-            style={{ padding: '0.6rem 1.25rem', background: '#2563eb', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}
-          >
-            + Add Card
+      <div className="container">
+        <div className="page-header">
+          <div className="page-header-left">
+            <button className="back-btn" onClick={() => navigate('/')}>← Back</button>
+            <div>
+              <h1 className="page-title">{language?.flag_emoji} {language?.name}</h1>
+              <p className="page-subtitle">{cards.length} {cards.length === 1 ? 'card' : 'cards'}</p>
+            </div>
+          </div>
+          <button className="btn btn-primary" onClick={() => setShowAdd(v => !v)}>
+            {showAdd ? 'Done adding' : '+ Add cards'}
           </button>
         </div>
 
         {showAdd && (
-          <form onSubmit={handleAdd} style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', marginBottom: '1.5rem', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
-            <h3 style={{ marginBottom: '1rem' }}>New Card</h3>
-            {error && <p style={{ color: 'red', marginBottom: '0.75rem' }}>{error}</p>}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
-              <div>
-                <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 500 }}>English</label>
-                <input value={newCard.english} onChange={e => setNewCard({ ...newCard, english: e.target.value })} style={{ width: '100%', padding: '0.6rem', border: '1px solid #ddd', borderRadius: '8px' }} required />
+          <div className="add-card-form">
+            <div className="add-card-fields">
+              <div className="form-group">
+                <label className="form-label">Word / Phrase</label>
+                <input
+                  ref={englishRef}
+                  className="input"
+                  value={newCard.english}
+                  onChange={e => setNewCard({ ...newCard, english: e.target.value })}
+                  onKeyDown={e => handleKeyDown(e, 'english')}
+                  placeholder="English"
+                />
               </div>
-              <div>
-                <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 500 }}>Translation</label>
-                <input value={newCard.translation} onChange={e => setNewCard({ ...newCard, translation: e.target.value })} style={{ width: '100%', padding: '0.6rem', border: '1px solid #ddd', borderRadius: '8px' }} required />
+              <div className="form-group">
+                <label className="form-label">Translation</label>
+                <input
+                  ref={translationRef}
+                  className="input"
+                  value={newCard.translation}
+                  onChange={e => setNewCard({ ...newCard, translation: e.target.value })}
+                  onKeyDown={e => handleKeyDown(e, 'translation')}
+                  placeholder="Translation"
+                />
               </div>
-              <div>
-                <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 500 }}>Pronunciation (optional)</label>
-                <input value={newCard.pronunciation} onChange={e => setNewCard({ ...newCard, pronunciation: e.target.value })} style={{ width: '100%', padding: '0.6rem', border: '1px solid #ddd', borderRadius: '8px' }} />
-              </div>
-              <div>
-                <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 500 }}>Notes (optional)</label>
-                <input value={newCard.notes} onChange={e => setNewCard({ ...newCard, notes: e.target.value })} style={{ width: '100%', padding: '0.6rem', border: '1px solid #ddd', borderRadius: '8px' }} />
+              <div className="form-group add-card-fields-full">
+                <label className="form-label">Notes (optional)</label>
+                <input
+                  ref={notesRef}
+                  className="input"
+                  value={newCard.notes}
+                  onChange={e => setNewCard({ ...newCard, notes: e.target.value })}
+                  onKeyDown={e => handleKeyDown(e, 'notes')}
+                  placeholder="Mnemonic, example sentence, context…"
+                />
               </div>
             </div>
-            <div style={{ display: 'flex', gap: '0.75rem' }}>
-              <button type="submit" style={{ padding: '0.6rem 1.25rem', background: '#2563eb', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}>Add Card</button>
-              <button type="button" onClick={() => { setShowAdd(false); setError('') }} style={{ padding: '0.6rem 1.25rem', border: '1px solid #ddd', borderRadius: '8px', cursor: 'pointer', background: 'white' }}>Cancel</button>
+            <div className="add-card-footer">
+              <div className="add-card-feedback">
+                {flash && <span className="flash-success">✓ Card added</span>}
+                {addedCount > 0 && !flash && (
+                  <span className="add-card-count">{addedCount} {addedCount === 1 ? 'card' : 'cards'} added</span>
+                )}
+                {error && <span className="error-msg">{error}</span>}
+              </div>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <button className="btn btn-outline btn-sm" onClick={() => setShowAdd(false)}>Done</button>
+                <button
+                  className="btn btn-primary btn-sm"
+                  onClick={submitCard}
+                  disabled={!newCard.english.trim() || !newCard.translation.trim()}
+                >
+                  Add card
+                </button>
+              </div>
             </div>
-          </form>
+          </div>
         )}
 
-        {loading ? <p style={{ color: '#666' }}>Loading...</p> : cards.length === 0 ? (
-          <div style={{ background: 'white', padding: '3rem', borderRadius: '12px', textAlign: 'center', color: '#666' }}>
-            <p style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🃏</p>
-            <p style={{ fontWeight: 500 }}>{search ? 'No cards match your search' : 'No cards yet'}</p>
+        <div className="search-row">
+          <input
+            className="input"
+            value={search}
+            onChange={handleSearch}
+            placeholder="Search cards…"
+          />
+        </div>
+
+        {loading ? (
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Loading…</p>
+        ) : cards.length === 0 ? (
+          <div className="empty-state">
+            <div className="empty-icon">🃏</div>
+            <p className="empty-title">{search ? 'No cards match your search' : 'No cards yet'}</p>
+            <p className="empty-text">{search ? 'Try a different query' : 'Click "Add cards" above to get started'}</p>
           </div>
         ) : (
-          <div style={{ display: 'grid', gap: '0.75rem' }}>
+          <div className="card-list">
             {cards.map(card => (
-              <div key={card.id} style={{ background: 'white', padding: '1rem 1.5rem', borderRadius: '12px', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div key={card.id} className="word-card">
                 <div>
-                  <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'baseline' }}>
-                    <span style={{ fontWeight: 600 }}>{card.english}</span>
-                    <span style={{ color: '#2563eb', fontSize: '1.1rem' }}>{card.translation}</span>
-                    {card.pronunciation && <span style={{ color: '#888', fontSize: '0.85rem' }}>/{card.pronunciation}/</span>}
+                  <div className="word-pair">
+                    <span className="word-en">{card.english}</span>
+                    <span className="word-tr">{card.translation}</span>
                   </div>
-                  {card.notes && <p style={{ color: '#666', fontSize: '0.85rem', marginTop: '0.25rem' }}>{card.notes}</p>}
+                  {card.notes && <p className="word-notes">{card.notes}</p>}
                 </div>
-                <button onClick={() => handleDelete(card.id)} style={{ padding: '0.4rem 0.75rem', background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca', borderRadius: '8px', cursor: 'pointer', marginLeft: '1rem' }}>
+                <button className="btn btn-sm btn-danger-soft" onClick={() => handleDelete(card.id)}>
                   Delete
                 </button>
               </div>

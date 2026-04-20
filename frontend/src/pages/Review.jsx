@@ -41,95 +41,88 @@ export default function Review() {
   }
 
   const ratings = [
-    { quality: 0, label: 'Again', sublabel: 'Forgot', color: '#dc2626', bg: '#fef2f2', border: '#fecaca' },
-    { quality: 3, label: 'Hard', sublabel: '<1 day', color: '#d97706', bg: '#fffbeb', border: '#fde68a' },
-    { quality: 4, label: 'Good', sublabel: 'A few days', color: '#2563eb', bg: '#eff6ff', border: '#bfdbfe' },
-    { quality: 5, label: 'Easy', sublabel: 'Long time', color: '#16a34a', bg: '#f0fdf4', border: '#bbf7d0' },
+    { quality: 0, label: 'Again',  sublabel: 'Forgot',     cls: 'rating-again' },
+    { quality: 3, label: 'Hard',   sublabel: '< 1 day',    cls: 'rating-hard'  },
+    { quality: 4, label: 'Good',   sublabel: 'Few days',   cls: 'rating-good'  },
+    { quality: 5, label: 'Easy',   sublabel: 'Long time',  cls: 'rating-easy'  },
   ]
 
   if (loading) return (
-    <div style={{ minHeight: '100vh', background: '#f5f5f5' }}>
+    <div className="page">
       <Navbar />
-      <div style={{ padding: '2rem', textAlign: 'center', color: '#666' }}>Loading...</div>
+      <p style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>Loading…</p>
     </div>
   )
 
   if (queue.length === 0 || done) return (
-    <div style={{ minHeight: '100vh', background: '#f5f5f5' }}>
+    <div className="page">
       <Navbar />
-      <div style={{ maxWidth: '500px', margin: '4rem auto', textAlign: 'center', padding: '2rem' }}>
-        <p style={{ fontSize: '3rem', marginBottom: '1rem' }}>🎉</p>
-        <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '0.5rem' }}>
-          {queue.length === 0 ? 'No cards due!' : 'Session complete!'}
-        </h2>
-        <p style={{ color: '#666', marginBottom: '2rem' }}>
+      <div className="done-screen">
+        <div className="done-icon">{done ? '🎉' : '✨'}</div>
+        <h2 className="done-title">{queue.length === 0 ? 'All caught up!' : 'Session complete!'}</h2>
+        <p className="done-text">
           {queue.length === 0
-            ? 'All cards are up to date. Come back later!'
+            ? 'No cards are due right now. Come back later!'
             : `You reviewed ${queue.length} ${queue.length === 1 ? 'card' : 'cards'}. Great work!`}
         </p>
-        <button
-          onClick={() => navigate('/')}
-          style={{ padding: '0.75rem 2rem', background: '#2563eb', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', fontSize: '1rem' }}
-        >
-          Back to dashboard
-        </button>
+        <button className="btn btn-primary btn-lg" onClick={() => navigate('/')}>Back to decks</button>
       </div>
     </div>
   )
 
   const card = queue[current].card
+  const progress = (current / queue.length) * 100
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f5f5f5' }}>
+    <div className="page">
       <Navbar />
-      <div style={{ maxWidth: '600px', margin: '0 auto', padding: '2rem' }}>
-
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-          <button onClick={() => navigate('/')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#666' }}>← Back</button>
-          <span style={{ color: '#666', fontSize: '0.9rem' }}>{current + 1} / {queue.length}</span>
-          <span style={{ color: '#666', fontSize: '0.9rem' }}>{language?.flag_emoji} {language?.name}</span>
+      <div className="container" style={{ maxWidth: '560px' }}>
+        <div className="review-meta">
+          <button className="back-btn" onClick={() => navigate('/')}>← Back</button>
+          <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 500 }}>
+            {current + 1} / {queue.length}
+          </span>
+          <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+            {language?.flag_emoji} {language?.name}
+          </span>
         </div>
 
-        <div style={{ background: 'white', borderRadius: '16px', boxShadow: '0 2px 12px rgba(0,0,0,0.1)', minHeight: '280px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2.5rem', marginBottom: '1.5rem', cursor: flipped ? 'default' : 'pointer', transition: 'all 0.2s' }}
-          onClick={() => !flipped && setFlipped(true)}
-        >
-          {!flipped ? (
-            <div style={{ textAlign: 'center' }}>
-              <p style={{ color: '#888', fontSize: '0.85rem', marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>English</p>
-              <p style={{ fontSize: '2rem', fontWeight: 700 }}>{card.english}</p>
-              <p style={{ color: '#aaa', fontSize: '0.9rem', marginTop: '1.5rem' }}>Tap to reveal</p>
+        <div className="progress-bar">
+          <div className="progress-bar-fill" style={{ width: `${progress}%` }} />
+        </div>
+
+        <div className="flip-card" onClick={() => !flipped && setFlipped(true)}>
+          <div className={`flip-card-inner${flipped ? ' flipped' : ''}`}>
+            <div className="flip-card-face">
+              <p className="flip-label">English</p>
+              <p className="flip-word">{card.english}</p>
+              <p className="flip-hint">Click to reveal</p>
             </div>
-          ) : (
-            <div style={{ textAlign: 'center' }}>
-              <p style={{ color: '#888', fontSize: '0.85rem', marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Translation</p>
-              <p style={{ fontSize: '2.25rem', fontWeight: 700, color: '#2563eb' }}>{card.translation}</p>
-              {card.pronunciation && (
-                <p style={{ color: '#888', fontSize: '1rem', marginTop: '0.5rem' }}>/{card.pronunciation}/</p>
-              )}
-              {card.notes && (
-                <p style={{ color: '#666', fontSize: '0.9rem', marginTop: '1rem', fontStyle: 'italic' }}>{card.notes}</p>
-              )}
+            <div className="flip-card-face flip-card-back">
+              <p className="flip-label">Translation</p>
+              <p className="flip-word-tr">{card.translation}</p>
+              {card.notes && <p className="flip-notes">{card.notes}</p>}
             </div>
-          )}
+          </div>
         </div>
 
         {flipped && (
-          <div>
-            <p style={{ textAlign: 'center', color: '#666', fontSize: '0.9rem', marginBottom: '1rem' }}>How well did you remember?</p>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.75rem' }}>
+          <>
+            <p className="review-prompt">How well did you remember?</p>
+            <div className="rating-grid">
               {ratings.map(r => (
                 <button
                   key={r.quality}
+                  className={`rating-btn ${r.cls}`}
                   onClick={() => handleRate(r.quality)}
                   disabled={submitting}
-                  style={{ padding: '0.75rem 0.5rem', background: r.bg, color: r.color, border: `1px solid ${r.border}`, borderRadius: '10px', fontWeight: 700, cursor: 'pointer', fontSize: '0.9rem' }}
                 >
-                  <div>{r.label}</div>
-                  <div style={{ fontSize: '0.75rem', fontWeight: 400, marginTop: '0.2rem', opacity: 0.8 }}>{r.sublabel}</div>
+                  {r.label}
+                  <div className="rating-sublabel">{r.sublabel}</div>
                 </button>
               ))}
             </div>
-          </div>
+          </>
         )}
       </div>
     </div>
