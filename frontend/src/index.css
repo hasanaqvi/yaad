@@ -282,11 +282,35 @@ select.input { padding-right: 2rem; }
 }
 .deck-card:hover { box-shadow: var(--shadow-md); }
 
-.deck-flag { font-size: 2rem; line-height: 1; }
+.deck-flag { font-size: 1.75rem; line-height: 1; flex-shrink: 0; }
 .deck-info { display: flex; align-items: center; gap: 1rem; cursor: pointer; flex: 1; min-width: 0; }
 .deck-name { font-weight: 600; font-size: 1rem; }
 .deck-count { color: var(--text-muted); font-size: 0.85rem; margin-top: 0.1rem; }
-.deck-actions { display: flex; gap: 0.5rem; flex-shrink: 0; }
+.deck-actions { display: flex; gap: 0.5rem; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end; }
+
+.deck-progress-bar {
+  height: 3px;
+  width: 120px;
+  background: var(--border);
+  border-radius: 99px;
+  margin-top: 0.4rem;
+  overflow: hidden;
+}
+.deck-progress-fill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 99px;
+  transition: width 0.4s ease;
+  min-width: 2px;
+}
+
+.deck-edit-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.25rem 0;
+}
 
 .btn-review {
   background: var(--primary-light);
@@ -644,6 +668,26 @@ select.input { padding-right: 2rem; }
   transition: width 0.3s ease;
 }
 
+.review-actions-row {
+  display: flex;
+  justify-content: center;
+  margin: 0.5rem 0 1rem;
+}
+.review-skip {
+  font-size: 0.8rem;
+  color: var(--text-subtle);
+}
+.review-skip:hover { color: var(--text-muted); }
+
+.rating-key {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  opacity: 0.55;
+  margin-right: 0.3rem;
+  letter-spacing: 0.02em;
+}
+
 .review-prompt {
   text-align: center;
   font-size: 0.8rem;
@@ -756,3 +800,48 @@ select.input { padding-right: 2rem; }
 .done-icon { font-size: 3rem; margin-bottom: 1rem; }
 .done-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; }
 .done-text { color: var(--text-muted); margin-bottom: 2rem; font-size: 0.95rem; }
+
+/* ── Mobile responsive ─────────────────────────────────── */
+@media (max-width: 640px) {
+  .container, .container-sm { padding: 1.25rem 1rem; }
+
+  /* Navbar: icon-only pills, tighter spacing */
+  .navbar { padding: 0 1rem; }
+  .nav-pill .nav-label { display: none; }
+  .nav-pill { padding: 0.35rem 0.5rem; }
+  .navbar-right { gap: 0.5rem; }
+
+  /* Hero */
+  .hero-title { font-size: 2.25rem; }
+
+  /* Stat grid stays 2-col, fine */
+
+  /* Progress tier: 2x2 */
+  .progress-tier-grid { grid-template-columns: 1fr 1fr; }
+
+  /* Add card form: single column */
+  .add-card-fields { grid-template-columns: 1fr; }
+
+  /* Rating buttons: 2x2 */
+  .rating-grid { grid-template-columns: 1fr 1fr; }
+
+  /* Deck actions: smaller buttons */
+  .deck-actions .btn { font-size: 0.75rem; padding: 0.35rem 0.6rem; }
+
+  /* Library table: scroll horizontally */
+  .lib-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+  /* Page header: stack on mobile */
+  .page-header { flex-wrap: wrap; }
+
+  /* Flip card: smaller min-height */
+  .flip-card-inner, .flip-card-face { min-height: 200px; }
+  .flip-word, .flip-word-tr { font-size: 1.75rem; }
+
+  /* Library filters: stack */
+  .library-filters { flex-direction: column; }
+  .library-filters .input { width: 100% !important; }
+
+  /* Profile identity: tighter */
+  .profile-avatar { width: 52px; height: 52px; font-size: 1.4rem; }
+}

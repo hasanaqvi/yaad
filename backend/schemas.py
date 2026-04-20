@@ -35,6 +35,11 @@ class LanguageCreate(BaseModel):
     flag_emoji: Optional[str] = None
 
 
+class LanguageUpdate(BaseModel):
+    name: Optional[str] = None
+    flag_emoji: Optional[str] = None
+
+
 class LanguageOut(BaseModel):
     id: int
     name: str
@@ -42,6 +47,7 @@ class LanguageOut(BaseModel):
     created_at: datetime
     card_count: Optional[int] = 0
     due_count: Optional[int] = 0
+    mastered_count: Optional[int] = 0
 
     class Config:
         from_attributes = True

@@ -26,7 +26,7 @@ export default function Navbar() {
             to={item.to}
             className={`nav-pill${pathname === item.to ? ' active' : ''}`}
           >
-            {item.icon} {item.label}
+            {item.icon} <span className="nav-label">{item.label}</span>
           </Link>
         ))}
         <button className="theme-toggle" onClick={toggle} title={theme === 'dark' ? 'Light mode' : 'Dark mode'}>

@@ -95,7 +95,7 @@ export default function Profile() {
             </div>
             <div className="progress-tier-grid">
               {PROGRESS_TIERS.map(t => (
-                <div key={t.key} className="stat-card" style={{ borderTop: `3px solid ${t.border}` }}>
+                <div key={t.key} className="stat-card lift" style={{ borderTop: `3px solid ${t.border}` }}>
                   <span className="stat-num" style={{ fontSize: '1.75rem', color: t.color }}>
                     {stats[t.key]}
                   </span>

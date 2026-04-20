@@ -123,7 +123,7 @@ export default function Library() {
             <p className="empty-text">Try adjusting your filters</p>
           </div>
         ) : (
-          <div className="card" style={{ overflow: 'hidden' }}>
+          <div className="card lib-table-wrap">
             <table className="lib-table">
               <thead>
                 <tr>

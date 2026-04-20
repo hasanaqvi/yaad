@@ -31,8 +31,18 @@ def get_languages(
             .count()
         )
         lang_out = schemas.LanguageOut.model_validate(lang)
+        mastered = (
+            db.query(models.ReviewLog)
+            .join(models.Card, models.Card.id == models.ReviewLog.card_id)
+            .filter(
+                models.Card.language_id == lang.id,
+                models.ReviewLog.interval_days >= 21,
+            )
+            .count()
+        )
         lang_out.card_count = count
         lang_out.due_count = due
+        lang_out.mastered_count = mastered
         result.append(lang_out)
     return result
 
@@ -59,6 +69,41 @@ def create_language(
     db.commit()
     db.refresh(language)
     return schemas.LanguageOut(card_count=0, **language.__dict__)
+
+
+@router.put("/{language_id}", response_model=schemas.LanguageOut)
+def update_language(
+    language_id: int,
+    payload: schemas.LanguageUpdate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    language = db.query(models.Language).filter(
+        models.Language.id == language_id,
+        models.Language.user_id == current_user.id,
+    ).first()
+    if not language:
+        raise HTTPException(status_code=404, detail="Language not found")
+
+    if payload.name is not None:
+        dup = db.query(models.Language).filter(
+            models.Language.user_id == current_user.id,
+            models.Language.name == payload.name,
+            models.Language.id != language_id,
+        ).first()
+        if dup:
+            raise HTTPException(status_code=409, detail=f"You already have a '{payload.name}' deck")
+        language.name = payload.name
+
+    if payload.flag_emoji is not None:
+        language.flag_emoji = payload.flag_emoji
+
+    db.commit()
+    db.refresh(language)
+    count = db.query(models.Card).filter(models.Card.language_id == language_id).count()
+    result = schemas.LanguageOut.model_validate(language)
+    result.card_count = count
+    return result
 
 
 @router.delete("/{language_id}", status_code=status.HTTP_204_NO_CONTENT)

@@ -3,6 +3,13 @@ import { useParams, useNavigate } from 'react-router-dom'
 import api from '../api/client'
 import Navbar from '../components/Navbar'
 
+const RATINGS = [
+  { quality: 0, label: 'Again', sublabel: 'Forgot',    cls: 'rating-again', key: '1' },
+  { quality: 3, label: 'Hard',  sublabel: '< 1 day',   cls: 'rating-hard',  key: '2' },
+  { quality: 4, label: 'Good',  sublabel: 'Few days',  cls: 'rating-good',  key: '3' },
+  { quality: 5, label: 'Easy',  sublabel: 'Long time', cls: 'rating-easy',  key: '4' },
+]
+
 export default function Review() {
   const { languageId } = useParams()
   const navigate = useNavigate()
@@ -16,8 +23,7 @@ export default function Review() {
 
   useEffect(() => {
     api.get('/languages/').then(res => {
-      const lang = res.data.find(l => l.id === parseInt(languageId))
-      setLanguage(lang)
+      setLanguage(res.data.find(l => l.id === parseInt(languageId)))
     })
     api.get(`/reviews/due/${languageId}`).then(res => {
       setQueue(res.data)
@@ -25,27 +31,40 @@ export default function Review() {
     })
   }, [languageId])
 
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return
+      if ((e.key === ' ' || e.key === 'Enter') && !flipped) {
+        e.preventDefault()
+        setFlipped(true)
+        return
+      }
+      if (flipped && !submitting) {
+        const r = RATINGS.find(r => r.key === e.key)
+        if (r) handleRate(r.quality)
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [flipped, submitting, current, queue])
+
   const handleRate = async (quality) => {
     if (submitting) return
     setSubmitting(true)
-    const card = queue[current]
-    await api.post('/reviews/submit', { card_id: card.card.id, quality })
+    await api.post('/reviews/submit', { card_id: queue[current].card.id, quality })
     const next = current + 1
-    if (next >= queue.length) {
-      setDone(true)
-    } else {
-      setCurrent(next)
-      setFlipped(false)
-    }
+    if (next >= queue.length) setDone(true)
+    else { setCurrent(next); setFlipped(false) }
     setSubmitting(false)
   }
 
-  const ratings = [
-    { quality: 0, label: 'Again',  sublabel: 'Forgot',     cls: 'rating-again' },
-    { quality: 3, label: 'Hard',   sublabel: '< 1 day',    cls: 'rating-hard'  },
-    { quality: 4, label: 'Good',   sublabel: 'Few days',   cls: 'rating-good'  },
-    { quality: 5, label: 'Easy',   sublabel: 'Long time',  cls: 'rating-easy'  },
-  ]
+  const handleSkip = () => {
+    const updated = [...queue]
+    const [skipped] = updated.splice(current, 1)
+    updated.push(skipped)
+    setQueue(updated)
+    setFlipped(false)
+  }
 
   if (loading) return (
     <div className="page">
@@ -96,7 +115,7 @@ export default function Review() {
             <div className="flip-card-face">
               <p className="flip-label">English</p>
               <p className="flip-word">{card.english}</p>
-              <p className="flip-hint">Click to reveal</p>
+              <p className="flip-hint">Click or press Space</p>
             </div>
             <div className="flip-card-face flip-card-back">
               <p className="flip-label">Translation</p>
@@ -106,17 +125,24 @@ export default function Review() {
           </div>
         </div>
 
+        <div className="review-actions-row">
+          <button className="btn btn-ghost btn-sm review-skip" onClick={handleSkip}>
+            Skip →
+          </button>
+        </div>
+
         {flipped && (
           <>
             <p className="review-prompt">How well did you remember?</p>
             <div className="rating-grid">
-              {ratings.map(r => (
+              {RATINGS.map(r => (
                 <button
                   key={r.quality}
                   className={`rating-btn ${r.cls}`}
                   onClick={() => handleRate(r.quality)}
                   disabled={submitting}
                 >
+                  <span className="rating-key">{r.key}</span>
                   {r.label}
                   <div className="rating-sublabel">{r.sublabel}</div>
                 </button>
