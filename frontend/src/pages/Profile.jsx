@@ -3,6 +3,30 @@ import { useAuth } from '../context/AuthContext'
 import api from '../api/client'
 import Navbar from '../components/Navbar'
 
+const NerdAvatar = () => (
+  <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ width: '100%', height: '100%', padding: '6px' }}>
+    {/* Hair */}
+    <ellipse cx="32" cy="20" rx="13" ry="8" fill="currentColor" opacity="0.4" />
+    {/* Ears */}
+    <ellipse cx="17" cy="34" rx="2.5" ry="3.5" fill="currentColor" opacity="0.25" />
+    <ellipse cx="47" cy="34" rx="2.5" ry="3.5" fill="currentColor" opacity="0.25" />
+    {/* Left glasses lens */}
+    <rect x="16" y="29" width="12" height="9" rx="3.5" stroke="currentColor" strokeWidth="1.8" />
+    {/* Right glasses lens */}
+    <rect x="36" y="29" width="12" height="9" rx="3.5" stroke="currentColor" strokeWidth="1.8" />
+    {/* Bridge */}
+    <line x1="28" y1="33.5" x2="36" y2="33.5" stroke="currentColor" strokeWidth="1.8" />
+    {/* Temples */}
+    <line x1="16" y1="33.5" x2="13" y2="32.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    <line x1="48" y1="33.5" x2="51" y2="32.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    {/* Eyes */}
+    <circle cx="22" cy="33.5" r="2" fill="currentColor" />
+    <circle cx="42" cy="33.5" r="2" fill="currentColor" />
+    {/* Smile */}
+    <path d="M26 42 Q32 48 38 42" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+  </svg>
+)
+
 const PROGRESS_TIERS = [
   { key: 'new',       label: 'New',       color: 'var(--text-muted)',  border: 'var(--border)' },
   { key: 'learning',  label: 'Learning',  color: 'var(--accent)',      border: 'var(--accent)' },
@@ -38,7 +62,7 @@ export default function Profile() {
         {/* Identity card */}
         <div className="card card-padded profile-identity">
           <div className="profile-avatar">
-            {user?.display_name?.charAt(0).toUpperCase()}
+            <NerdAvatar />
           </div>
           <div>
             <h1 className="page-title">{user?.display_name}</h1>
