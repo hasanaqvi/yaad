@@ -117,7 +117,7 @@ export default function Dashboard() {
               {languages.map(lang => (
                 <div key={lang.id} className="deck-card lift">
                   <div className="deck-info" onClick={() => navigate(`/languages/${lang.id}`)}>
-                    <span className="deck-flag">{lang.flag_emoji || '🌐'}</span>
+                    {lang.flag_emoji && <span className="deck-flag">{lang.flag_emoji}</span>}
                     <div>
                       <p className="deck-name">{lang.name}</p>
                       <p className="deck-count">
