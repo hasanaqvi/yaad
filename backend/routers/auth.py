@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from datetime import datetime
+from datetime import datetime, timezone
 from database import get_db
 import models, schemas
 from auth import hash_password, verify_password, create_access_token, get_current_user
@@ -47,7 +47,7 @@ def get_stats(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user),
 ):
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     logs = (
         db.query(models.ReviewLog)
         .join(models.Card, models.Card.id == models.ReviewLog.card_id)
