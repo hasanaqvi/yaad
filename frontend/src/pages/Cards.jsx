@@ -78,7 +78,7 @@ export default function Cards() {
             style={{ padding: '0.6rem 1.25rem', background: '#2563eb', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}
           >
             + Add Card
-        </button>
+          </button>
         </div>
 
         {showAdd && (

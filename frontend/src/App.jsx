@@ -5,6 +5,7 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
 import Cards from './pages/Cards'
+import Review from './pages/Review'
 
 export default function App() {
   return (
@@ -15,6 +16,7 @@ export default function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
           <Route path="/languages/:languageId" element={<PrivateRoute><Cards /></PrivateRoute>} />
+          <Route path="/review/:languageId" element={<PrivateRoute><Review /></PrivateRoute>} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
