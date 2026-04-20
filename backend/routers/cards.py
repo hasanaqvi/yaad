@@ -20,6 +20,45 @@ def get_language_or_404(language_id: int, user_id: int, db: Session) -> models.L
     return language
 
 
+@router.get("/library", response_model=List[schemas.CardLibraryOut])
+def get_library(
+    language_id: Optional[int] = Query(None),
+    search: Optional[str] = Query(None),
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    query = (
+        db.query(models.Card, models.ReviewLog, models.Language)
+        .join(models.ReviewLog, models.ReviewLog.card_id == models.Card.id)
+        .join(models.Language, models.Language.id == models.Card.language_id)
+        .filter(models.Card.user_id == current_user.id)
+    )
+    if language_id:
+        query = query.filter(models.Card.language_id == language_id)
+    if search:
+        pattern = f"%{search.lower()}%"
+        query = query.filter(
+            (models.Card.english.ilike(pattern)) |
+            (models.Card.translation.ilike(pattern))
+        )
+    results = query.order_by(models.Language.name, models.Card.english).all()
+    return [
+        schemas.CardLibraryOut(
+            id=card.id,
+            language_id=card.language_id,
+            language_name=lang.name,
+            flag_emoji=lang.flag_emoji,
+            english=card.english,
+            translation=card.translation,
+            notes=card.notes,
+            interval_days=log.interval_days,
+            next_review_date=log.next_review_date,
+            repetitions=log.repetitions,
+        )
+        for card, log, lang in results
+    ]
+
+
 @router.get("/{language_id}", response_model=List[schemas.CardOut])
 def get_cards(
     language_id: int,

@@ -2,8 +2,14 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
 
+const NAV_ITEMS = [
+  { to: '/',        label: 'Home',    icon: '🏠' },
+  { to: '/library', label: 'Library', icon: '📚' },
+  { to: '/profile', label: 'Profile', icon: '👤' },
+]
+
 export default function Navbar() {
-  const { user, logout } = useAuth()
+  const { logout } = useAuth()
   const { theme, toggle } = useTheme()
   const { pathname } = useLocation()
   const navigate = useNavigate()
@@ -14,11 +20,16 @@ export default function Navbar() {
         <span className="logo-text" style={{ color: 'var(--primary)' }}>Yaad</span>
       </Link>
       <div className="navbar-right">
-        <Link to="/" className={`nav-pill${pathname === '/' ? ' active' : ''}`}>
-          🏠 Home
-        </Link>
-        <span className="navbar-user">{user?.display_name}</span>
-        <button className="theme-toggle" onClick={toggle} title={theme === 'dark' ? 'Switch to light' : 'Switch to dark'}>
+        {NAV_ITEMS.map(item => (
+          <Link
+            key={item.to}
+            to={item.to}
+            className={`nav-pill${pathname === item.to ? ' active' : ''}`}
+          >
+            {item.icon} {item.label}
+          </Link>
+        ))}
+        <button className="theme-toggle" onClick={toggle} title={theme === 'dark' ? 'Light mode' : 'Dark mode'}>
           {theme === 'dark' ? '☀️' : '🌙'}
         </button>
         <button className="btn btn-outline btn-sm" onClick={() => { logout(); navigate('/login') }}>

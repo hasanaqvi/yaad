@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from datetime import datetime
 from database import get_db
 import models, schemas
 from auth import hash_password, verify_password, create_access_token, get_current_user
@@ -39,3 +40,25 @@ def login(payload: schemas.UserLogin, db: Session = Depends(get_db)):
 @router.get("/me", response_model=schemas.UserOut)
 def get_me(current_user: models.User = Depends(get_current_user)):
     return current_user
+
+
+@router.get("/stats", response_model=schemas.UserStats)
+def get_stats(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    now = datetime.utcnow()
+    logs = (
+        db.query(models.ReviewLog)
+        .join(models.Card, models.Card.id == models.ReviewLog.card_id)
+        .filter(models.Card.user_id == current_user.id)
+        .all()
+    )
+    return schemas.UserStats(
+        total_cards=len(logs),
+        due_today=sum(1 for l in logs if l.next_review_date <= now),
+        new=sum(1 for l in logs if l.repetitions == 0),
+        learning=sum(1 for l in logs if l.repetitions > 0 and l.interval_days < 7),
+        reviewing=sum(1 for l in logs if 7 <= l.interval_days < 21),
+        mastered=sum(1 for l in logs if l.interval_days >= 21),
+    )

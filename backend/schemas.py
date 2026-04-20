@@ -94,3 +94,25 @@ class ReviewLogOut(BaseModel):
 class DueCardOut(BaseModel):
     card: CardOut
     review_log: ReviewLogOut
+
+
+class CardLibraryOut(BaseModel):
+    id: int
+    language_id: int
+    language_name: str
+    flag_emoji: Optional[str]
+    english: str
+    translation: str
+    notes: Optional[str]
+    interval_days: int
+    next_review_date: datetime
+    repetitions: int
+
+
+class UserStats(BaseModel):
+    total_cards: int
+    due_today: int
+    new: int
+    learning: int
+    reviewing: int
+    mastered: int
