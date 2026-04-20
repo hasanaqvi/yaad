@@ -8,9 +8,9 @@
   --text:           #1C1C1A;
   --text-muted:     #747468;
   --text-subtle:    #ABABAB;
-  --primary:        #7D9E8C;
-  --primary-hover:  #6B8C7A;
-  --primary-light:  #EDF4F0;
+  --primary:        #3D7A5E;
+  --primary-hover:  #2F6450;
+  --primary-light:  #EAF3EE;
   --accent:         #C4622D;
   --accent-hover:   #AD5526;
   --accent-light:   #FBF0EA;
@@ -35,9 +35,9 @@
   --text:           #EEEEE8;
   --text-muted:     #909088;
   --text-subtle:    #5A5A52;
-  --primary:        #8AAF97;
-  --primary-hover:  #9BBFA8;
-  --primary-light:  #1C2820;
+  --primary:        #5A9E80;
+  --primary-hover:  #6BB090;
+  --primary-light:  #1A2820;
   --accent:         #D4723A;
   --accent-hover:   #E08048;
   --accent-light:   #261A12;
@@ -341,9 +341,7 @@ h3 { font-size: 1rem; font-weight: 600; }
   align-items: center;
   justify-content: space-between;
   padding: 0.875rem 1.25rem;
-  transition: box-shadow 0.15s;
 }
-.word-card:hover { box-shadow: var(--shadow-md); }
 .word-en { font-weight: 600; font-size: 0.95rem; }
 .word-tr { color: var(--primary); font-size: 1rem; font-weight: 500; }
 .word-notes { color: var(--text-muted); font-size: 0.8rem; margin-top: 0.2rem; }
@@ -454,6 +452,131 @@ h3 { font-size: 1rem; font-weight: 600; }
 .rating-hard:hover:not(:disabled)  { background: var(--accent);  color: white; }
 .rating-good:hover:not(:disabled)  { background: var(--primary); color: white; }
 .rating-easy:hover:not(:disabled)  { background: var(--success); color: white; }
+
+/* ── Lift animation ────────────────────────────────────── */
+.lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.lift:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* ── Hero section ──────────────────────────────────────── */
+.hero {
+  text-align: center;
+  padding: 2.5rem 0 2rem;
+}
+.hero-title {
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--primary);
+  letter-spacing: -0.03em;
+  margin-bottom: 0.75rem;
+}
+.hero-subtitle {
+  color: var(--text-muted);
+  font-size: 1rem;
+  max-width: 380px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ── Stat cards ────────────────────────────────────────── */
+.stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 1.5rem;
+  text-align: center;
+  cursor: default;
+}
+.stat-num {
+  display: block;
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--primary);
+  letter-spacing: -0.03em;
+  line-height: 1;
+  margin-bottom: 0.4rem;
+}
+.stat-num-accent { color: var(--accent); }
+.stat-label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* ── Dashed container ──────────────────────────────────── */
+.dashed-container {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-lg);
+  padding: 3rem 2rem;
+  text-align: center;
+  background: var(--bg);
+}
+.dashed-icon-wrap {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--primary-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+  font-size: 1.5rem;
+}
+.dashed-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+.dashed-text {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+  max-width: 300px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ── Nav pill ──────────────────────────────────────────── */
+.nav-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 99px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  color: var(--text-muted);
+  transition: background 0.15s, color 0.15s;
+}
+.nav-pill:hover { background: var(--surface-raised); color: var(--text); }
+.nav-pill.active { background: var(--surface-raised); color: var(--text); }
+
+/* ── Decks section header ──────────────────────────────── */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+.section-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
 
 /* ── Misc ──────────────────────────────────────────────── */
 .page-header {

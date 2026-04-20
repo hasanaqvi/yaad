@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
+from datetime import datetime
 from database import get_db
 from auth import get_current_user
 import models, schemas
@@ -20,8 +21,18 @@ def get_languages(
     result = []
     for lang in languages:
         count = db.query(models.Card).filter(models.Card.language_id == lang.id).count()
+        due = (
+            db.query(models.ReviewLog)
+            .join(models.Card, models.Card.id == models.ReviewLog.card_id)
+            .filter(
+                models.Card.language_id == lang.id,
+                models.ReviewLog.next_review_date <= datetime.utcnow(),
+            )
+            .count()
+        )
         lang_out = schemas.LanguageOut.model_validate(lang)
         lang_out.card_count = count
+        lang_out.due_count = due
         result.append(lang_out)
     return result
 

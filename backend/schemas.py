@@ -41,6 +41,7 @@ class LanguageOut(BaseModel):
     flag_emoji: Optional[str]
     created_at: datetime
     card_count: Optional[int] = 0
+    due_count: Optional[int] = 0
 
     class Config:
         from_attributes = True

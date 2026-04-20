@@ -36,18 +36,30 @@ export default function Dashboard() {
     setLanguages(languages.filter(l => l.id !== id))
   }
 
+  const totalCards = languages.reduce((s, l) => s + (l.card_count || 0), 0)
+  const dueToday = languages.reduce((s, l) => s + (l.due_count || 0), 0)
+
   return (
     <div className="page">
       <Navbar />
-      <div className="container">
-        <div className="page-header">
-          <div>
-            <h1 className="page-title">Welcome back, {user?.display_name}</h1>
-            <p className="page-subtitle">Your language decks</p>
+      <div className="container" style={{ maxWidth: '680px' }}>
+
+        <div className="hero">
+          <h1 className="hero-title">Yaad</h1>
+          <p className="hero-subtitle">Remember with ease. Your personal vocabulary companion.</p>
+        </div>
+
+        <div className="stat-grid">
+          <div className="stat-card lift">
+            <span className="stat-num">{loading ? '—' : totalCards}</span>
+            <span className="stat-label">Total Cards</span>
           </div>
-          <button className="btn btn-primary" onClick={() => setShowAdd(!showAdd)}>
-            + Add deck
-          </button>
+          <div className="stat-card lift">
+            <span className={`stat-num${dueToday > 0 ? ' stat-num-accent' : ''}`}>
+              {loading ? '—' : dueToday}
+            </span>
+            <span className="stat-label">Due Today</span>
+          </div>
         </div>
 
         {showAdd && (
@@ -84,33 +96,49 @@ export default function Dashboard() {
           </form>
         )}
 
-        {loading ? (
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Loading…</p>
-        ) : languages.length === 0 ? (
-          <div className="empty-state">
-            <div className="empty-icon">📚</div>
-            <p className="empty-title">No decks yet</p>
-            <p className="empty-text">Add your first language deck to get started</p>
+        {loading ? null : languages.length === 0 ? (
+          <div className="dashed-container">
+            <div className="dashed-icon-wrap">📖</div>
+            <p className="dashed-title">Start Your Journey</p>
+            <p className="dashed-text">Add your first flashcards to begin learning a new language</p>
+            <button className="btn btn-primary btn-lg" onClick={() => setShowAdd(true)}>
+              + Add Your First Deck
+            </button>
           </div>
         ) : (
-          <div className="card-list">
-            {languages.map(lang => (
-              <div key={lang.id} className="deck-card">
-                <div className="deck-info" onClick={() => navigate(`/languages/${lang.id}`)}>
-                  <span className="deck-flag">{lang.flag_emoji || '🌐'}</span>
-                  <div>
-                    <p className="deck-name">{lang.name}</p>
-                    <p className="deck-count">{lang.card_count} {lang.card_count === 1 ? 'card' : 'cards'}</p>
+          <>
+            <div className="section-header">
+              <span className="section-title">Your Decks</span>
+              <button className="btn btn-primary btn-sm" onClick={() => setShowAdd(v => !v)}>
+                + Add deck
+              </button>
+            </div>
+            <div className="card-list">
+              {languages.map(lang => (
+                <div key={lang.id} className="deck-card lift">
+                  <div className="deck-info" onClick={() => navigate(`/languages/${lang.id}`)}>
+                    <span className="deck-flag">{lang.flag_emoji || '🌐'}</span>
+                    <div>
+                      <p className="deck-name">{lang.name}</p>
+                      <p className="deck-count">
+                        {lang.card_count} {lang.card_count === 1 ? 'card' : 'cards'}
+                        {lang.due_count > 0 && (
+                          <span style={{ color: 'var(--accent)', marginLeft: '0.5rem' }}>
+                            · {lang.due_count} due
+                          </span>
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="deck-actions">
+                    <button className="btn btn-sm btn-review" onClick={() => navigate(`/review/${lang.id}`)}>Review</button>
+                    <button className="btn btn-sm btn-cards" onClick={() => navigate(`/languages/${lang.id}`)}>Cards</button>
+                    <button className="btn btn-sm btn-danger-soft" onClick={() => handleDelete(lang.id, lang.name)}>Delete</button>
                   </div>
                 </div>
-                <div className="deck-actions">
-                  <button className="btn btn-sm btn-review" onClick={() => navigate(`/review/${lang.id}`)}>Review</button>
-                  <button className="btn btn-sm btn-cards" onClick={() => navigate(`/languages/${lang.id}`)}>Cards</button>
-                  <button className="btn btn-sm btn-danger-soft" onClick={() => handleDelete(lang.id, lang.name)}>Delete</button>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </>
         )}
       </div>
     </div>
