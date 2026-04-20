@@ -17,7 +17,7 @@ export default function Navbar() {
   return (
     <nav className="navbar">
       <Link to="/" style={{ textDecoration: 'none' }}>
-        <span className="logo-text" style={{ color: 'var(--primary)' }}>Yaad</span>
+        <span className="logo-text">یاد</span>
       </Link>
       <div className="navbar-right">
         {NAV_ITEMS.map(item => (
